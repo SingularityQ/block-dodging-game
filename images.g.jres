@@ -1,9 +1,4 @@
 {
-    "image1": {
-        "data": "hwQQABAAAAAAAAAAAAAAAABwAFVmB1AAAGUHZXYHZQZQZnZmdlVmdgBlZneIWGcHAFB2h4iIdQBQdneIyIhYdlB2h4iIyFh2UHaHjIiIWHZQdoeIjMhYdlB2d4iIiFh2AFB2h4yIdQAAZWZ3iFh2B1BmdmZmVWZ2AGUHZWYHZQYAcABlZgdQAA==",
-        "mimeType": "image/x-mkcd-f4",
-        "displayName": "GearAnimation1"
-    },
     "image2": {
         "data": "hwQQABAAAAAAAAAAAAAAAAAAUGYHUAYAAABldgBldgAABlBmV2YHAFB2ZneIVQUFUHZ2h4jIVXYAZXaIjIhYdgBgh4iIiFh2UGCHyIiMWGBQdoeIiIhYAFB2d8iIiFUGUHZ2h4iMVXYABWV2iFhVdgAAZXZldgAFAFBmB1BmBwAAAHYAZXYAAA==",
         "mimeType": "image/x-mkcd-f4",
@@ -18,6 +13,11 @@
         "data": "hwQQABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
         "mimeType": "image/x-mkcd-f4",
         "displayName": "cameraCenterImage"
+    },
+    "image1": {
+        "data": "hwQQABAAAAAAAAAAAAAAAABwAFVmB1AAAGUHZXYHZQZQZnZmdlVmdgBlZneIWGcHAFB2h4iIdQBQdneIyIhYdlB2h4iIyFh2UHaHjIiIWHZQdoeIjMhYdlB2d4iIiFh2AFB2h4yIdQAAZWZ3iFh2B1BmdmZmVWZ2AGUHZWYHZQYAcABlZgdQAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "GearAnimation1"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",

@@ -1,29 +1,32 @@
 namespace SpriteKind {
     export const mainEnemy = SpriteKind.create()
+    export const Hitbox = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX, playerY - 1))
+    playerMovement(0, -1)
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX - 1, playerY))
+    playerMovement(-1, 0)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherSprite) {
+    scene.cameraShake(2, 100)
+    info.changeLifeBy(-1)
+    pause(500)
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + 1, playerY))
+    playerMovement(1, 0)
 })
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    playerMovement(0, 1)
+})
+function playerMovement (xshift: number, yshift: number) {
+    scene.cameraShake(1.5, 100)
     playerX = mainPlayer.tilemapLocation().column
     playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX, playerY + 1))
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Player, function (sprite, otherSprite) {
-	
-})
+    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+}
+let mainCoinType: Sprite = null
+let mainEnemyHitbox: Sprite = null
 let mainEnemyType: Sprite = null
 let playerY = 0
 let playerX = 0
@@ -33,6 +36,8 @@ let queuedMovementY = 0
 tiles.setCurrentTilemap(tilemap`level1`)
 mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
 tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
+let allEnemiesList: Sprite[] = []
+info.setLife(3)
 game.onUpdateInterval(1000, function () {
     mainEnemyType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -52,7 +57,13 @@ game.onUpdateInterval(1000, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.mainEnemy)
+    mainEnemyType.lifespan = 1900
     tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    for (let value of allEnemiesList) {
+        if (spriteutils.distanceBetween(mainEnemyType, value) < 10) {
+            tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+        }
+    }
     animation.runImageAnimation(
     mainEnemyType,
     [img`
@@ -382,9 +393,52 @@ game.onUpdateInterval(1000, function () {
     100,
     false
     )
-    timer.after(1900, function () {
-        sprites.destroy(mainEnemyType, effects.coolRadial, 500)
-    })
+    allEnemiesList.push(mainEnemyType)
+    mainEnemyHitbox = sprites.create(img`
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 
+        `, SpriteKind.Hitbox)
+    mainEnemyHitbox.lifespan = 1900
+    mainEnemyHitbox.setPosition(mainEnemyType.x, mainEnemyType.y)
+    mainEnemyHitbox.setFlag(SpriteFlag.Ghost, true)
+    mainEnemyHitbox.setFlag(SpriteFlag.Invisible, true)
+    sprites.setDataNumber(mainEnemyHitbox, "creationtimer", 8)
+    sprites.setDataNumber(mainEnemyHitbox, "spawntimer", 15)
+})
+game.onUpdateInterval(1000, function () {
+    mainCoinType = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 5 5 5 5 . . . . . . 
+        . . . . . 5 7 7 7 7 6 . . . . . 
+        . . . . 5 7 7 f 7 7 7 6 . . . . 
+        . . . 5 7 7 f 7 f 7 7 7 6 . . . 
+        . . . 5 7 f 7 7 7 f 7 7 6 . . . 
+        . . . 5 7 f 7 7 7 7 7 7 6 . . . 
+        . . . 6 7 f 7 7 7 7 7 7 8 . . . 
+        . . . 6 7 f 7 7 7 7 7 7 8 . . . 
+        . . . 6 7 f 7 7 7 f 7 7 8 . . . 
+        . . . 6 7 7 f 7 f 7 7 7 8 . . . 
+        . . . . 6 7 7 f 7 7 7 8 . . . . 
+        . . . . . 8 7 7 7 7 8 . . . . . 
+        . . . . . . 8 8 8 8 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.Player)
+    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
 })
 forever(function () {
     mainPlayer.setImage(assets.image`GearAnimation1`)
@@ -392,7 +446,20 @@ forever(function () {
     mainPlayer.setImage(assets.image`GearAnimation2`)
     pause(100)
     mainPlayer.setImage(assets.image`GearAnimation3`)
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        if (sprites.readDataNumber(value, "spawntimer") <= 0) {
+            sprites.destroy(value)
+        }
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        if (sprites.readDataNumber(value, "creationtimer") <= 0) {
+            value.setFlag(SpriteFlag.Ghost, false)
+        }
+    }
 })
-game.onUpdateInterval(500, function () {
-	
+game.onUpdateInterval(100, function () {
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        sprites.changeDataNumberBy(value, "spawntimer", -1)
+        sprites.changeDataNumberBy(value, "creationtimer", -1)
+    }
 })
