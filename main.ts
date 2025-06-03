@@ -25,6 +25,9 @@ function playerMovement (xshift: number, yshift: number) {
     playerY = mainPlayer.tilemapLocation().row
     tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+	
+})
 let mainCoinType: Sprite = null
 let mainEnemyHitbox: Sprite = null
 let mainEnemyType: Sprite = null
@@ -59,11 +62,6 @@ game.onUpdateInterval(1000, function () {
         `, SpriteKind.mainEnemy)
     mainEnemyType.lifespan = 1900
     tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
-    for (let value of allEnemiesList) {
-        if (spriteutils.distanceBetween(mainEnemyType, value) < 10) {
-            tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
-        }
-    }
     animation.runImageAnimation(
     mainEnemyType,
     [img`
@@ -424,21 +422,132 @@ game.onUpdateInterval(1000, function () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . 5 5 5 5 . . . . . . 
-        . . . . . 5 7 7 7 7 6 . . . . . 
-        . . . . 5 7 7 f 7 7 7 6 . . . . 
-        . . . 5 7 7 f 7 f 7 7 7 6 . . . 
-        . . . 5 7 f 7 7 7 f 7 7 6 . . . 
-        . . . 5 7 f 7 7 7 7 7 7 6 . . . 
-        . . . 6 7 f 7 7 7 7 7 7 8 . . . 
-        . . . 6 7 f 7 7 7 7 7 7 8 . . . 
-        . . . 6 7 f 7 7 7 f 7 7 8 . . . 
-        . . . 6 7 7 f 7 f 7 7 7 8 . . . 
-        . . . . 6 7 7 f 7 7 7 8 . . . . 
-        . . . . . 8 7 7 7 7 8 . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . 5 6 6 f 6 6 6 7 . . . . 
+        . . . 5 6 6 f 6 f 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 f 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 f 6 6 8 . . . 
+        . . . 7 6 6 f 6 f 6 6 6 8 . . . 
+        . . . . 7 6 6 f 6 6 6 8 . . . . 
+        . . . . . 8 6 6 6 6 8 . . . . . 
         . . . . . . 8 8 8 8 . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `, SpriteKind.Player)
-    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+        `, SpriteKind.Food)
+    animation.runImageAnimation(
+    mainCoinType,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 5 5 5 5 . . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . 5 6 6 f 6 6 6 7 . . . . 
+        . . . 5 6 6 f 6 f 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 f 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 f 6 6 8 . . . 
+        . . . 7 6 6 f 6 f 6 6 6 8 . . . 
+        . . . . 7 6 6 f 6 6 6 8 . . . . 
+        . . . . . 8 6 6 6 6 8 . . . . . 
+        . . . . . . 8 8 8 8 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 5 5 . . . . . . . 
+        . . . . . . 5 6 6 5 . . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . 5 6 6 f 6 6 6 5 . . . . 
+        . . . . 5 6 f 6 f 6 6 7 . . . . 
+        . . . . 5 6 f 6 6 6 6 7 . . . . 
+        . . . . 5 6 f 6 6 6 6 7 . . . . 
+        . . . . 7 6 f 6 6 6 6 7 . . . . 
+        . . . . 7 6 f 6 f 6 6 8 . . . . 
+        . . . . 7 6 6 f 6 6 6 8 . . . . 
+        . . . . . 7 6 6 6 6 8 . . . . . 
+        . . . . . . 8 6 6 8 . . . . . . 
+        . . . . . . . 8 8 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . 5 . . . . . . . 
+        . . . . . . . 5 6 5 . . . . . . 
+        . . . . . . 5 6 6 6 5 . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . . 5 6 f f 6 5 . . . . . 
+        . . . . . 5 6 f 6 6 7 . . . . . 
+        . . . . . 5 6 f 6 6 7 . . . . . 
+        . . . . . 7 6 f 6 6 7 . . . . . 
+        . . . . . 7 6 f f 6 7 . . . . . 
+        . . . . . 7 6 6 6 6 8 . . . . . 
+        . . . . . . 7 6 6 6 8 . . . . . 
+        . . . . . . . 8 6 8 . . . . . . 
+        . . . . . . . . 8 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 5 5 . . . . . . . 
+        . . . . . . . 5 5 . . . . . . . 
+        . . . . . . 5 5 5 . . . . . . . 
+        . . . . . . 5 5 5 . . . . . . . 
+        . . . . . . 5 5 5 . . . . . . . 
+        . . . . . . 5 7 7 . . . . . . . 
+        . . . . . . 7 7 7 . . . . . . . 
+        . . . . . . 7 7 7 . . . . . . . 
+        . . . . . . 7 8 8 . . . . . . . 
+        . . . . . . . 8 8 . . . . . . . 
+        . . . . . . . 8 8 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . 5 . . . . . . . 
+        . . . . . . . 5 6 5 . . . . . . 
+        . . . . . . 5 6 6 6 5 . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . . 5 6 f f 6 5 . . . . . 
+        . . . . . 5 6 f 6 6 7 . . . . . 
+        . . . . . 5 6 f 6 6 7 . . . . . 
+        . . . . . 7 6 f 6 6 7 . . . . . 
+        . . . . . 7 6 f f 6 7 . . . . . 
+        . . . . . 7 6 6 6 6 8 . . . . . 
+        . . . . . . 7 6 6 6 8 . . . . . 
+        . . . . . . . 8 6 8 . . . . . . 
+        . . . . . . . . 8 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 5 5 . . . . . . . 
+        . . . . . . 5 6 6 5 . . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . 5 6 6 f 6 6 6 5 . . . . 
+        . . . . 5 6 f 6 f 6 6 7 . . . . 
+        . . . . 5 6 f 6 6 6 6 7 . . . . 
+        . . . . 5 6 f 6 6 6 6 7 . . . . 
+        . . . . 7 6 f 6 6 6 6 7 . . . . 
+        . . . . 7 6 f 6 f 6 6 8 . . . . 
+        . . . . 7 6 6 f 6 6 6 8 . . . . 
+        . . . . . 7 6 6 6 6 8 . . . . . 
+        . . . . . . 8 6 6 8 . . . . . . 
+        . . . . . . . 8 8 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
+    100,
+    true
+    )
+    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        value.startEffect(effects.fire, 100)
+    }
 })
 forever(function () {
     mainPlayer.setImage(assets.image`GearAnimation1`)
