@@ -3,7 +3,9 @@ namespace SpriteKind {
     export const Hitbox = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(0, -1)
+    if (!(inShop)) {
+        playerMovement(0, -1)
+    }
 })
 function createCoin () {
     mainCoinType = sprites.create(img`
@@ -138,9 +140,6 @@ function createCoin () {
         value.startEffect(effects.fire, 100)
     }
 }
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(1, 0)
-})
 function createEnemy () {
     mainEnemyType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -517,8 +516,15 @@ function createEnemy () {
     sprites.setDataNumber(mainEnemyHitbox, "creationtimer", 8)
     sprites.setDataNumber(mainEnemyHitbox, "spawntimer", 15)
 }
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(0, 1)
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(-1, 0)
+    }
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(1, 0)
+    }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherSprite) {
     scene.cameraShake(2, 100)
@@ -531,12 +537,14 @@ function playerMovement (xshift: number, yshift: number) {
     playerY = mainPlayer.tilemapLocation().row
     tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
 }
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(-1, 0)
-})
 function enterShop () {
     inShop = true
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(0, 1)
+    }
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.changeScoreBy(1)
     sprites.destroy(otherSprite, effects.spray, 100)
@@ -544,12 +552,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
 info.onCountdownEnd(function () {
     enterShop()
 })
-let inShop = false
 let playerY = 0
 let playerX = 0
 let mainEnemyHitbox: Sprite = null
 let mainEnemyType: Sprite = null
 let mainCoinType: Sprite = null
+let inShop = false
 let allEnemiesList: Sprite[] = []
 let mainPlayer: Sprite = null
 info.startCountdown(20)
@@ -577,11 +585,13 @@ game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
     }
 })
 forever(function () {
-    mainPlayer.setImage(assets.image`GearAnimation1`)
-    pause(100)
-    mainPlayer.setImage(assets.image`GearAnimation2`)
-    pause(100)
-    mainPlayer.setImage(assets.image`GearAnimation3`)
+    if (!(inShop)) {
+        mainPlayer.setImage(assets.image`GearAnimation1`)
+        pause(100)
+        mainPlayer.setImage(assets.image`GearAnimation2`)
+        pause(100)
+        mainPlayer.setImage(assets.image`GearAnimation3`)
+    }
     for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
         if (sprites.readDataNumber(value, "spawntimer") <= 0) {
             sprites.destroy(value)
