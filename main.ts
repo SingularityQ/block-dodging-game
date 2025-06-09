@@ -26,7 +26,8 @@ function playerMovement (xshift: number, yshift: number) {
     tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-	
+    info.changeScoreBy(1)
+    sprites.destroy(otherSprite, effects.spray, 100)
 })
 let mainCoinType: Sprite = null
 let mainEnemyHitbox: Sprite = null
