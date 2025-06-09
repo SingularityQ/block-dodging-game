@@ -135,7 +135,7 @@ function createCoin () {
     100,
     true
     )
-    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
     sprites.setDataNumber(mainCoinType, "despawntimer", 20)
     for (let value of sprites.allOfKind(SpriteKind.Food)) {
         value.startEffect(effects.fire, 100)
@@ -161,7 +161,7 @@ function createEnemy () {
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.mainEnemy)
     mainEnemyType.lifespan = 1900
-    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
     animation.runImageAnimation(
     mainEnemyType,
     [img`
@@ -536,7 +536,9 @@ function playerMovement (xshift: number, yshift: number) {
     scene.cameraShake(1.5, 100)
     playerX = mainPlayer.tilemapLocation().column
     playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+    if (!(tiles.tileAtLocationIsWall(tiles.getTileLocation(playerX + xshift, playerY + yshift)))) {
+        tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+    }
 }
 function enterShop () {
     inShop = true
@@ -563,6 +565,25 @@ let inShop = false
 let allEnemiesList: Sprite[] = []
 let mainPlayer: Sprite = null
 let shopUI: Sprite = null
+let cameraCenter = sprites.create(img`
+    . . 3 3 3 3 3 3 3 3 3 . . . . . 
+    . 3 3 . . . . . . . . . . . . . 
+    . 3 . . . . . . . . . . . . . . 
+    3 3 . . . . 3 3 3 3 3 . . . . . 
+    3 . . . . 3 . . . . 3 3 3 . . . 
+    3 . . . 3 . . . . . . . 3 3 . . 
+    3 . . . 3 . . 3 3 3 . . . 3 . . 
+    3 . . . 3 . . 3 . 3 3 . . 3 . . 
+    3 . . . 3 . . 3 . . . 3 . . 3 . 
+    . 3 . . 3 . . . . . . 3 . . 3 . 
+    . 3 . . 3 3 . . . . . 3 . . 3 . 
+    . 3 . . . 3 3 . . . 3 . . . . 3 
+    . . 3 . . . 3 3 3 3 . . . . . 3 
+    . . 3 3 3 . . . . . . . . . 3 3 
+    . . . . 3 3 3 3 . . . . 3 3 3 . 
+    . . . . . . . 3 3 3 3 3 3 . . . 
+    `, SpriteKind.UI)
+cameraCenter.setPosition(55, 40)
 shopUI = sprites.create(img`
     ....111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111....
     ..1113333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333111..
@@ -631,7 +652,7 @@ shopUI = sprites.create(img`
     `, SpriteKind.UI)
 shopUI.z = 100
 shopUI.setFlag(SpriteFlag.Invisible, true)
-info.startCountdown(1)
+info.startCountdown(20)
 let enemyDifficulty = 0
 let coinFrequency = 0
 let queuedMovementX = 0
