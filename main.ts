@@ -13,36 +13,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherS
     info.changeLifeBy(-1)
     pause(500)
 })
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(1, 0)
-})
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    playerMovement(0, 1)
-})
-function playerMovement (xshift: number, yshift: number) {
-    scene.cameraShake(1.5, 100)
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
-}
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    info.changeScoreBy(1)
-    sprites.destroy(otherSprite, effects.spray, 100)
-})
-let mainCoinType: Sprite = null
-let mainEnemyHitbox: Sprite = null
-let mainEnemyType: Sprite = null
-let playerY = 0
-let playerX = 0
-let mainPlayer: Sprite = null
-let queuedMovementX = 0
-let queuedMovementY = 0
-tiles.setCurrentTilemap(tilemap`level1`)
-mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
-tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
-let allEnemiesList: Sprite[] = []
-info.setLife(3)
-game.onUpdateInterval(1000, function () {
+function createEnemy () {
     mainEnemyType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -417,6 +388,39 @@ game.onUpdateInterval(1000, function () {
     mainEnemyHitbox.setFlag(SpriteFlag.Invisible, true)
     sprites.setDataNumber(mainEnemyHitbox, "creationtimer", 8)
     sprites.setDataNumber(mainEnemyHitbox, "spawntimer", 15)
+}
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    playerMovement(1, 0)
+})
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    playerMovement(0, 1)
+})
+function playerMovement (xshift: number, yshift: number) {
+    scene.cameraShake(1.5, 100)
+    playerX = mainPlayer.tilemapLocation().column
+    playerY = mainPlayer.tilemapLocation().row
+    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+}
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    info.changeScoreBy(1)
+    sprites.destroy(otherSprite, effects.spray, 100)
+})
+let mainCoinType: Sprite = null
+let playerY = 0
+let playerX = 0
+let mainEnemyHitbox: Sprite = null
+let mainEnemyType: Sprite = null
+let allEnemiesList: Sprite[] = []
+let mainPlayer: Sprite = null
+let queuedMovementX = 0
+let queuedMovementY = 0
+tiles.setCurrentTilemap(tilemap`level1`)
+mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
+tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
+allEnemiesList = []
+info.setLife(3)
+game.onUpdateInterval(1000, function () {
+    createEnemy()
 })
 game.onUpdateInterval(1000, function () {
     mainCoinType = sprites.create(img`
@@ -546,6 +550,7 @@ game.onUpdateInterval(1000, function () {
     true
     )
     tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    sprites.setDataNumber(mainCoinType, "despawntimer", 20)
     for (let value of sprites.allOfKind(SpriteKind.Food)) {
         value.startEffect(effects.fire, 100)
     }
@@ -560,10 +565,13 @@ forever(function () {
         if (sprites.readDataNumber(value, "spawntimer") <= 0) {
             sprites.destroy(value)
         }
-    }
-    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
         if (sprites.readDataNumber(value, "creationtimer") <= 0) {
             value.setFlag(SpriteFlag.Ghost, false)
+        }
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        if (sprites.readDataNumber(value, "despawntimer") <= 0) {
+            sprites.destroy(value, effects.fire, 100)
         }
     }
 })
@@ -571,5 +579,8 @@ game.onUpdateInterval(100, function () {
     for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
         sprites.changeDataNumberBy(value, "spawntimer", -1)
         sprites.changeDataNumberBy(value, "creationtimer", -1)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        sprites.changeDataNumberBy(value, "despawntimer", -1)
     }
 })
