@@ -539,6 +539,11 @@ function playerMovement (xshift: number, yshift: number) {
 }
 function enterShop () {
     inShop = true
+    shopUI.setFlag(SpriteFlag.Invisible, false)
+    shopUI.setScale(0.01, ScaleAnchor.Middle)
+    for (let index = 0; index <= 200; index++) {
+        shopUI.setScale(1 / (1 + e ** (2 * (5 - 5 * (index / 100)))), ScaleAnchor.Middle)
+    }
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(inShop)) {
@@ -560,6 +565,44 @@ let mainCoinType: Sprite = null
 let inShop = false
 let allEnemiesList: Sprite[] = []
 let mainPlayer: Sprite = null
+let shopUI: Sprite = null
+let e = 0
+e = 2.71828182846
+shopUI = sprites.create(img`
+    1111111111111111111111111111111111111111111111111111111111111111
+    1999999999999999999999999933399999999999993333333333333333333332
+    19ccc9c9c9ccc9ccc9ccc9ccc93339ccc9c9c9ccc99933333333333333333332
+    19c999c9c9c9c9c9c9c999c9993339c9c9ccc9c999c933333333333333333332
+    19c939ccc9c9c9c9c9ccc9cc933339c9c9ccc9cc999933333333333333333332
+    19c999c9c9c9c9c9c999c9c9993339c9c9c9c9c999c933333333333333333332
+    19ccc9c9c9ccc9ccc9ccc9ccc93339ccc9c9c9ccc99933333333333333333332
+    1999999999999999999999999933399999999999993333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1333333333333333333333333333333333333333333333333333333333333332
+    1323333333333333333333333333333333333333333333333333333333333232
+    1333333333333333333333333333333333333333333333333333333333333332
+    1222222222222222222222222222222222222222222222222222222222222222
+    `, SpriteKind.Player)
+shopUI.setFlag(SpriteFlag.Invisible, true)
 info.startCountdown(20)
 let enemyDifficulty = 0
 let coinFrequency = 0
@@ -570,20 +613,6 @@ mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
 tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
 allEnemiesList = []
 info.setLife(3)
-game.onUpdateInterval(100, function () {
-    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
-        sprites.changeDataNumberBy(value, "spawntimer", -1)
-        sprites.changeDataNumberBy(value, "creationtimer", -1)
-    }
-    for (let value of sprites.allOfKind(SpriteKind.Food)) {
-        sprites.changeDataNumberBy(value, "despawntimer", -1)
-    }
-})
-game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
-    if (!(inShop)) {
-        createCoin()
-    }
-})
 forever(function () {
     if (!(inShop)) {
         mainPlayer.setImage(assets.image`GearAnimation1`)
@@ -604,6 +633,20 @@ forever(function () {
         if (sprites.readDataNumber(value, "despawntimer") <= 0) {
             sprites.destroy(value, effects.fire, 100)
         }
+    }
+})
+game.onUpdateInterval(100, function () {
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        sprites.changeDataNumberBy(value, "spawntimer", -1)
+        sprites.changeDataNumberBy(value, "creationtimer", -1)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        sprites.changeDataNumberBy(value, "despawntimer", -1)
+    }
+})
+game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
+    if (!(inShop)) {
+        createCoin()
     }
 })
 game.onUpdateInterval(1000 - 10 * enemyDifficulty, function () {
