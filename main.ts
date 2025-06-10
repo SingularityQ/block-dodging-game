@@ -8,6 +8,19 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
         playerMovement(0, -1)
     }
 })
+function exitShop () {
+    inShop = false
+    shopUI.setFlag(SpriteFlag.Invisible, true)
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.mainEnemy)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+}
 function createCoin () {
     mainCoinType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -135,12 +148,27 @@ function createCoin () {
     100,
     true
     )
-    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
     sprites.setDataNumber(mainCoinType, "despawntimer", 20)
-    for (let value of sprites.allOfKind(SpriteKind.Food)) {
-        value.startEffect(effects.fire, 100)
-    }
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (inShop) {
+        exitShop()
+    }
+})
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(0, 1)
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherSprite) {
+    scene.cameraShake(2, 100)
+    info.changeLifeBy(-1)
+    pause(500)
+})
+info.onCountdownEnd(function () {
+    enterShop()
+})
 function createEnemy () {
     mainEnemyType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -161,7 +189,7 @@ function createEnemy () {
         . . . . . . . . . . . . . . . . 
         `, SpriteKind.mainEnemy)
     mainEnemyType.lifespan = 1900
-    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(0, 8), randint(0, 6)))
+    tiles.placeOnTile(mainEnemyType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
     animation.runImageAnimation(
     mainEnemyType,
     [img`
@@ -517,43 +545,41 @@ function createEnemy () {
     sprites.setDataNumber(mainEnemyHitbox, "creationtimer", 8)
     sprites.setDataNumber(mainEnemyHitbox, "spawntimer", 15)
 }
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(inShop)) {
-        playerMovement(-1, 0)
-    }
-})
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(inShop)) {
         playerMovement(1, 0)
     }
 })
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherSprite) {
-    scene.cameraShake(2, 100)
-    info.changeLifeBy(-1)
-    pause(500)
-})
-function playerMovement (xshift: number, yshift: number) {
-    scene.cameraShake(1.5, 100)
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
-}
-function enterShop () {
-    inShop = true
-    shopUI.setFlag(SpriteFlag.Invisible, false)
-}
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(inShop)) {
         playerMovement(0, 1)
     }
 })
+function playerMovement (xshift: number, yshift: number) {
+    playerX = mainPlayer.tilemapLocation().column
+    playerY = mainPlayer.tilemapLocation().row
+    if (!(tiles.tileAtLocationIsWall(tiles.getTileLocation(playerX + xshift, playerY + yshift)))) {
+        tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+    }
+}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    scene.cameraShake(1.5, 100)
     info.changeScoreBy(1)
     sprites.destroy(otherSprite, effects.spray, 100)
 })
-info.onCountdownEnd(function () {
-    enterShop()
-})
+function enterShop () {
+    inShop = true
+    shopUI.setFlag(SpriteFlag.Invisible, false)
+    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.mainEnemy)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Food)) {
+        animation.stopAnimation(animation.AnimationTypes.All, value)
+    }
+}
 let playerY = 0
 let playerX = 0
 let mainEnemyHitbox: Sprite = null
@@ -563,6 +589,7 @@ let inShop = false
 let allEnemiesList: Sprite[] = []
 let mainPlayer: Sprite = null
 let shopUI: Sprite = null
+scene.centerCameraAt(87, 72)
 shopUI = sprites.create(img`
     ....111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111....
     ..1113333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333111..
@@ -631,7 +658,8 @@ shopUI = sprites.create(img`
     `, SpriteKind.UI)
 shopUI.z = 100
 shopUI.setFlag(SpriteFlag.Invisible, true)
-info.startCountdown(1)
+shopUI.setPosition(87, 72)
+info.startCountdown(20)
 let enemyDifficulty = 0
 let coinFrequency = 0
 let queuedMovementX = 0
@@ -641,35 +669,9 @@ mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
 tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
 allEnemiesList = []
 info.setLife(3)
-forever(function () {
+game.onUpdateInterval(1000 - 10 * enemyDifficulty, function () {
     if (!(inShop)) {
-        mainPlayer.setImage(assets.image`GearAnimation1`)
-        pause(100)
-        mainPlayer.setImage(assets.image`GearAnimation2`)
-        pause(100)
-        mainPlayer.setImage(assets.image`GearAnimation3`)
-    }
-    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
-        if (sprites.readDataNumber(value, "spawntimer") <= 0) {
-            sprites.destroy(value)
-        }
-        if (sprites.readDataNumber(value, "creationtimer") <= 0) {
-            value.setFlag(SpriteFlag.Ghost, false)
-        }
-    }
-    for (let value of sprites.allOfKind(SpriteKind.Food)) {
-        if (sprites.readDataNumber(value, "despawntimer") <= 0) {
-            sprites.destroy(value, effects.fire, 100)
-        }
-    }
-})
-game.onUpdateInterval(100, function () {
-    for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
-        sprites.changeDataNumberBy(value, "spawntimer", -1)
-        sprites.changeDataNumberBy(value, "creationtimer", -1)
-    }
-    for (let value of sprites.allOfKind(SpriteKind.Food)) {
-        sprites.changeDataNumberBy(value, "despawntimer", -1)
+        createEnemy()
     }
 })
 game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
@@ -677,8 +679,36 @@ game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
         createCoin()
     }
 })
-game.onUpdateInterval(1000 - 10 * enemyDifficulty, function () {
+forever(function () {
     if (!(inShop)) {
-        createEnemy()
+        mainPlayer.setImage(assets.image`GearAnimation1`)
+        pause(100)
+        mainPlayer.setImage(assets.image`GearAnimation2`)
+        pause(100)
+        mainPlayer.setImage(assets.image`GearAnimation3`)
+        for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+            if (sprites.readDataNumber(value, "spawntimer") <= 0) {
+                sprites.destroy(value)
+            }
+            if (sprites.readDataNumber(value, "creationtimer") <= 0) {
+                value.setFlag(SpriteFlag.Ghost, false)
+            }
+        }
+        for (let value of sprites.allOfKind(SpriteKind.Food)) {
+            if (sprites.readDataNumber(value, "despawntimer") <= 0) {
+                sprites.destroy(value, effects.fire, 100)
+            }
+        }
+    }
+})
+game.onUpdateInterval(100, function () {
+    if (!(inShop)) {
+        for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
+            sprites.changeDataNumberBy(value, "spawntimer", -1)
+            sprites.changeDataNumberBy(value, "creationtimer", -1)
+        }
+        for (let value of sprites.allOfKind(SpriteKind.Food)) {
+            sprites.changeDataNumberBy(value, "despawntimer", -1)
+        }
     }
 })
