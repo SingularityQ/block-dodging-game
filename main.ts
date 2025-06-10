@@ -917,7 +917,7 @@ shopUI = sprites.create(img`
     `, SpriteKind.UI)
 shopUI.z = 100
 shopUI.setFlag(SpriteFlag.Invisible, true)
-shopUI.setPosition(87, 72)
+shopUI.setPosition(89, 72)
 info.startCountdown(20)
 let enemyDifficulty = 0
 let coinFrequency = 0
