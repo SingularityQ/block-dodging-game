@@ -2,12 +2,9 @@ namespace SpriteKind {
     export const mainEnemy = SpriteKind.create()
     export const Hitbox = SpriteKind.create()
     export const UI = SpriteKind.create()
+    export const flyingEnemyKind = SpriteKind.create()
+    export const specialCoin = SpriteKind.create()
 }
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(inShop)) {
-        playerMovement(0, -1)
-    }
-})
 function exitShop () {
     inShop = false
     shopUI.setFlag(SpriteFlag.Invisible, true)
@@ -21,7 +18,161 @@ function exitShop () {
         sprites.destroy(value)
     }
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (inShop) {
+        exitShop()
+    }
+})
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(0, -1)
+    }
+})
 function createCoin () {
+    if (randint(0, 20) == 1) {
+        createSpecialCoin()
+    } else {
+        createNormalCoin()
+    }
+}
+function createSpecialCoin () {
+    mainCoinType = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 5 5 5 5 . . . . . . 
+        . . . . . 5 6 6 6 6 5 . . . . . 
+        . . . . 5 6 6 f 6 6 6 7 . . . . 
+        . . . 5 6 6 f 6 f 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 f 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 7 . . . 
+        . . . 5 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 6 6 6 8 . . . 
+        . . . 7 6 f 6 6 6 f 6 6 8 . . . 
+        . . . 7 6 6 f 6 f 6 6 6 8 . . . 
+        . . . . 7 6 6 f 6 6 6 8 . . . . 
+        . . . . . 8 6 6 6 6 8 . . . . . 
+        . . . . . . 8 8 8 8 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.specialCoin)
+    animation.runImageAnimation(
+    mainCoinType,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 1 1 1 1 . . . . . . 
+        . . . . . 1 3 3 3 3 1 . . . . . 
+        . . . . 1 3 3 f 3 3 3 1 . . . . 
+        . . . 1 3 3 f 3 f 3 3 3 1 . . . 
+        . . . 1 3 f 3 3 3 f 3 3 1 . . . 
+        . . . 1 3 f 3 3 3 3 3 3 1 . . . 
+        . . . 1 3 f 3 3 3 3 3 3 2 . . . 
+        . . . 1 3 f 3 3 3 3 3 3 2 . . . 
+        . . . 1 3 f 3 3 3 f 3 3 2 . . . 
+        . . . 1 3 3 f 3 f 3 3 3 2 . . . 
+        . . . . 1 3 3 f 3 3 3 2 . . . . 
+        . . . . . 2 3 3 3 3 2 . . . . . 
+        . . . . . . 2 2 2 2 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 1 1 . . . . . . . 
+        . . . . . . 1 3 3 1 . . . . . . 
+        . . . . . 1 3 3 3 3 1 . . . . . 
+        . . . . 1 3 3 f 3 3 3 1 . . . . 
+        . . . . 1 3 f 3 f 3 3 1 . . . . 
+        . . . . 1 3 f 3 3 3 3 1 . . . . 
+        . . . . 1 3 f 3 3 3 3 1 . . . . 
+        . . . . 1 3 f 3 3 3 3 1 . . . . 
+        . . . . 1 3 f 3 f 3 3 2 . . . . 
+        . . . . 1 3 3 f 3 3 3 2 . . . . 
+        . . . . . 1 3 3 3 3 2 . . . . . 
+        . . . . . . 2 3 3 2 . . . . . . 
+        . . . . . . . 2 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . 1 . . . . . . . 
+        . . . . . . . 1 2 1 . . . . . . 
+        . . . . . . 1 2 2 2 1 . . . . . 
+        . . . . . 1 2 2 2 2 1 . . . . . 
+        . . . . . 1 2 f f 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f f 2 1 . . . . . 
+        . . . . . 1 2 2 2 2 2 . . . . . 
+        . . . . . . 1 2 2 2 2 . . . . . 
+        . . . . . . . 2 2 2 . . . . . . 
+        . . . . . . . . 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 1 1 . . . . . . . 
+        . . . . . . . 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 1 1 . . . . . . . 
+        . . . . . . 1 2 2 . . . . . . . 
+        . . . . . . . 2 2 . . . . . . . 
+        . . . . . . . 2 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . 1 . . . . . . . 
+        . . . . . . . 1 2 1 . . . . . . 
+        . . . . . . 1 2 2 2 1 . . . . . 
+        . . . . . 1 2 2 2 2 1 . . . . . 
+        . . . . . 1 2 f f 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f 2 2 1 . . . . . 
+        . . . . . 1 2 f f 2 1 . . . . . 
+        . . . . . 1 2 2 2 2 2 . . . . . 
+        . . . . . . 1 2 2 2 2 . . . . . 
+        . . . . . . . 2 2 2 . . . . . . 
+        . . . . . . . . 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 1 1 . . . . . . . 
+        . . . . . . 1 2 2 1 . . . . . . 
+        . . . . . 1 2 2 2 2 1 . . . . . 
+        . . . . 1 2 2 f 2 2 2 1 . . . . 
+        . . . . 1 2 f 2 f 2 2 1 . . . . 
+        . . . . 1 2 f 2 2 2 2 1 . . . . 
+        . . . . 1 2 f 2 2 2 2 1 . . . . 
+        . . . . 1 2 f 2 2 2 2 1 . . . . 
+        . . . . 1 2 f 2 f 2 2 2 . . . . 
+        . . . . 1 2 2 f 2 2 2 2 . . . . 
+        . . . . . 1 2 2 2 2 2 . . . . . 
+        . . . . . . 2 2 2 2 . . . . . . 
+        . . . . . . . 2 2 . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
+    100,
+    true
+    )
+    tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
+    sprites.setDataNumber(mainCoinType, "despawntimer", 20)
+}
+function createEnemy () {
+    if (randint(0, 1) == 1) {
+        createSquareEnemy()
+    } else {
+        createFlyingEnemy()
+    }
+}
+function createNormalCoin () {
     mainCoinType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -151,14 +302,20 @@ function createCoin () {
     tiles.placeOnTile(mainCoinType, tiles.getTileLocation(randint(1, 9), randint(1, 7)))
     sprites.setDataNumber(mainCoinType, "despawntimer", 20)
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (inShop) {
-        exitShop()
-    }
-})
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(inShop)) {
         playerMovement(-1, 0)
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.flyingEnemyKind, function (sprite, otherSprite) {
+    scene.cameraShake(2, 100)
+    info.changeLifeBy(-1)
+    info.changeScoreBy(-1)
+    sprites.destroy(otherSprite, effects.ashes, 500)
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(1, 0)
     }
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherSprite) {
@@ -166,10 +323,14 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Hitbox, function (sprite, otherS
     info.changeLifeBy(-1)
     pause(500)
 })
-info.onCountdownEnd(function () {
-    enterShop()
-})
-function createEnemy () {
+function playerMovement (xshift: number, yshift: number) {
+    playerX = mainPlayer.tilemapLocation().column
+    playerY = mainPlayer.tilemapLocation().row
+    if (!(tiles.tileAtLocationIsWall(tiles.getTileLocation(playerX + xshift, playerY + yshift)))) {
+        tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
+    }
+}
+function createSquareEnemy () {
     mainEnemyType = sprites.create(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -545,29 +706,9 @@ function createEnemy () {
     sprites.setDataNumber(mainEnemyHitbox, "creationtimer", 8)
     sprites.setDataNumber(mainEnemyHitbox, "spawntimer", 15)
 }
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(inShop)) {
-        playerMovement(1, 0)
-    }
-})
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(inShop)) {
-        playerMovement(0, 1)
-    }
-})
-function playerMovement (xshift: number, yshift: number) {
-    playerX = mainPlayer.tilemapLocation().column
-    playerY = mainPlayer.tilemapLocation().row
-    if (!(tiles.tileAtLocationIsWall(tiles.getTileLocation(playerX + xshift, playerY + yshift)))) {
-        tiles.placeOnTile(mainPlayer, tiles.getTileLocation(playerX + xshift, playerY + yshift))
-    }
-}
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    scene.cameraShake(1.5, 100)
-    info.changeScoreBy(1)
-    sprites.destroy(otherSprite, effects.spray, 100)
-})
 function enterShop () {
+    game.setGameOverEffect(true, effects.confetti)
+    game.gameOver(true)
     inShop = true
     shopUI.setFlag(SpriteFlag.Invisible, false)
     for (let value of sprites.allOfKind(SpriteKind.Hitbox)) {
@@ -838,11 +979,302 @@ function enterShop () {
     sprites.setDataNumber(shopCardBase, "fallingtime", 2)
     shopCardBase.z = 11
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(inShop)) {
+        playerMovement(0, 1)
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.specialCoin, function (sprite, otherSprite) {
+    scene.cameraShake(1.5, 100)
+    info.changeScoreBy(3)
+    sprites.destroy(otherSprite, effects.fire, 100)
+    info.changeCountdownBy(5)
+})
+function createFlyingEnemy () {
+    flyingEnemy = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . f f . . . . . . . 
+        . . . . . . . f f . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        d d d d d d d d d d d d d d d d 
+        `, SpriteKind.flyingEnemyKind)
+    tiles.placeOnTile(flyingEnemy, tiles.getTileLocation(randint(1, 9), 0))
+    flyingEnemy.lifespan = 2350
+    flyingEnemy.setVelocity(0, 50)
+    animation.runImageAnimation(
+    flyingEnemy,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 a . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 a a . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 a a . 
+        . . 9 9 9 9 9 9 9 9 9 9 a a a . 
+        . . 9 9 9 9 9 9 9 9 9 9 a a a . 
+        . . 9 9 9 9 9 9 9 9 9 a a a a . 
+        . . . 9 9 9 9 9 9 9 a a a a . . 
+        . . . . 9 9 9 9 a a a a a . . . 
+        . . . . . 9 9 a a a a a . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . 9 9 9 9 9 9 9 9 9 9 a a a . 
+        . . 9 9 9 9 9 9 9 9 a a a a a . 
+        . . 9 9 9 9 9 9 9 a a a a a a . 
+        . . 9 9 9 9 9 9 a a a a a a a . 
+        . . 9 9 9 9 9 a a a a a a a a . 
+        . . 9 9 9 9 9 a a a a a a a b . 
+        . . 9 9 9 9 a a a a a a a b b . 
+        . . . 9 9 9 a a a a a a a b . . 
+        . . . . 9 9 a a a a a b b . . . 
+        . . . . . 9 a a a a b b . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . 9 9 9 9 9 9 9 9 a . . . 
+        . . . 9 9 9 9 a a a a a a a . . 
+        . . 9 9 9 9 9 a a a a a a a b . 
+        . . 9 9 9 9 a a a a a a a b b . 
+        . . 9 9 9 a a a a a a a a b b . 
+        . . 9 9 9 a a a a a a a b b b . 
+        . . 9 9 a a a a a a a a b b b . 
+        . . 9 a a a a a a a a b b b b . 
+        . . 9 a a a a a a a b b b b b . 
+        . . . a a a a a a b b b b b . . 
+        . . . . a a b b b b b b b . . . 
+        . . . . . b b b b b b b . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 9 9 9 a a . . . . 
+        . . . . 9 9 9 a a a a a a . . . 
+        . . . 9 9 9 a a a a a a b b . . 
+        . . 9 9 9 a a a a a a b b b c . 
+        . . 9 9 a a a a a a a b b b c . 
+        . . 9 9 a a a a a a b b b b c . 
+        . . 9 a a a a a a a b b b b c . 
+        . . 9 a a a a a a b b b b c c . 
+        . . a a a a a a b b b b b c c . 
+        . . a a a a a b b b b b c c c . 
+        . . . a b b b b b b b c c c . . 
+        . . . . b b b b b c c c c . . . 
+        . . . . . b b c c c c c . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . 9 9 a b b b c . . . . 
+        . . . . 9 9 a a b b b c c . . . 
+        . . . 9 a a a b b b b c c c . . 
+        . . 9 a a a a b b b c c c c c . 
+        . . 9 a a a a b b b c c c c c . 
+        . . a a a b b b b c c c c c c . 
+        . . a a b b b b c c c c c c c . 
+        . . b b b b b c c c c c c c c . 
+        . . b b b b c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . . c c c c c c c c c c c . . 
+        . . . . c c c c c c c c c . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . a a b c c c c . . . . 
+        . . . . a a b b c c c c c . . . 
+        . . . a a b b c c c c c c c . . 
+        . . a a b b b c c c c c c c c . 
+        . . a b b c c c c c c c c c c . 
+        . . b b c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . . c c c c c c c c c c c . . 
+        . . . . c c c c c c c c c . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . c c c c c c c c c . . . 
+        . . . c c c c c c c c c c c . . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . . c c c c c c c c c c c . . 
+        . . . . c c c c c c c c c . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . c c c c c c c c c . . . 
+        . . . c c c c c c c c c c c . . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c c c b b . 
+        . . c c c c c c c c c c b b a . 
+        . . c c c c c c c c b b b a a . 
+        . . . c c c c c c c b b a a . . 
+        . . . . c c c c c b b a a . . . 
+        . . . . . c c c c b a a . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . c c c c c c c . . . . 
+        . . . . c c c c c c c c c . . . 
+        . . . c c c c c c c c c c c . . 
+        . . c c c c c c c c c c c c c . 
+        . . c c c c c c c c c b b b b . 
+        . . c c c c c c c c b b b b b . 
+        . . c c c c c c c b b b b a a . 
+        . . c c c c c c b b b b a a a . 
+        . . c c c c c b b b a a a a 9 . 
+        . . c c c c c b b b a a a a 9 . 
+        . . . c c c b b b b a a a 9 . . 
+        . . . . c c b b b a a 9 9 . . . 
+        . . . . . c b b b a 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . c c c c c b b . . . . 
+        . . . . c c c c b b b b b . . . 
+        . . . c c c b b b b b b b a . . 
+        . . c c c b b b b b a a a a a . 
+        . . c c b b b b b a a a a a a . 
+        . . c c b b b b a a a a a a 9 . 
+        . . c b b b b a a a a a a a 9 . 
+        . . c b b b b a a a a a a 9 9 . 
+        . . c b b b a a a a a a a 9 9 . 
+        . . c b b b a a a a a a 9 9 9 . 
+        . . . b b a a a a a a 9 9 9 . . 
+        . . . . a a a a a a 9 9 9 . . . 
+        . . . . . a a 9 9 9 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . b b b b b b b . . . . 
+        . . . . b b b b b b b a a . . . 
+        . . . b b b b b a a a a a a . . 
+        . . b b b b b a a a a a a a 9 . 
+        . . b b b b a a a a a a a a 9 . 
+        . . b b b a a a a a a a a 9 9 . 
+        . . b b b a a a a a a a 9 9 9 . 
+        . . b b a a a a a a a a 9 9 9 . 
+        . . b b a a a a a a a 9 9 9 9 . 
+        . . b a a a a a a a 9 9 9 9 9 . 
+        . . . a a a a a a a 9 9 9 9 . . 
+        . . . . a 9 9 9 9 9 9 9 9 . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . b b a a a a 9 . . . . 
+        . . . . b b a a a a a 9 9 . . . 
+        . . . b a a a a a a a 9 9 9 . . 
+        . . b b a a a a a a a 9 9 9 9 . 
+        . . b a a a a a a a 9 9 9 9 9 . 
+        . . a a a a a a a a 9 9 9 9 9 . 
+        . . a a a a a a a 9 9 9 9 9 9 . 
+        . . a a a a a a 9 9 9 9 9 9 9 . 
+        . . a a a a a 9 9 9 9 9 9 9 9 . 
+        . . a a a 9 9 9 9 9 9 9 9 9 9 . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . a a a a a 9 9 . . . . 
+        . . . . a a a a a 9 9 9 9 . . . 
+        . . . a a a a 9 9 9 9 9 9 9 . . 
+        . . a a a a 9 9 9 9 9 9 9 9 9 . 
+        . . a a a 9 9 9 9 9 9 9 9 9 9 . 
+        . . a a a 9 9 9 9 9 9 9 9 9 9 . 
+        . . a a 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . a a 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . a 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . 9 9 9 9 9 9 9 9 9 9 9 9 9 . 
+        . . . 9 9 9 9 9 9 9 9 9 9 9 . . 
+        . . . . 9 9 9 9 9 9 9 9 9 . . . 
+        . . . . . 9 9 9 9 9 9 9 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
+    100,
+    true
+    )
+    allEnemiesList.push(flyingEnemy)
+    flyingEnemy.setFlag(SpriteFlag.Ghost, false)
+    flyingEnemy.setFlag(SpriteFlag.AutoDestroy, true)
+    flyingEnemy.setStayInScreen(false)
+}
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    scene.cameraShake(1.5, 100)
+    info.changeScoreBy(1)
+    sprites.destroy(otherSprite, effects.spray, 100)
+})
+info.onCountdownEnd(function () {
+    enterShop()
+})
+let flyingEnemy: Sprite = null
 let shopCardBase: Sprite = null
-let playerY = 0
-let playerX = 0
 let mainEnemyHitbox: Sprite = null
 let mainEnemyType: Sprite = null
+let playerY = 0
+let playerX = 0
 let mainCoinType: Sprite = null
 let inShop = false
 let allEnemiesList: Sprite[] = []
@@ -918,7 +1350,7 @@ shopUI = sprites.create(img`
 shopUI.z = 10
 shopUI.setFlag(SpriteFlag.Invisible, true)
 shopUI.setPosition(87, 72)
-info.startCountdown(0)
+info.startCountdown(20)
 let enemyDifficulty = 0
 let coinFrequency = 0
 let queuedMovementX = 0
@@ -928,16 +1360,6 @@ mainPlayer = sprites.create(assets.image`GearAnimation1`, SpriteKind.Player)
 tiles.placeOnTile(mainPlayer, tiles.getTileLocation(1, 3))
 allEnemiesList = []
 info.setLife(3)
-game.onUpdateInterval(1000 - 10 * enemyDifficulty, function () {
-    if (!(inShop)) {
-        createEnemy()
-    }
-})
-game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
-    if (!(inShop)) {
-        createCoin()
-    }
-})
 forever(function () {
     if (!(inShop)) {
         mainPlayer.setImage(assets.image`GearAnimation1`)
@@ -958,6 +1380,11 @@ forever(function () {
                 sprites.destroy(value, effects.fire, 100)
             }
         }
+        for (let value of sprites.allOfKind(SpriteKind.specialCoin)) {
+            if (sprites.readDataNumber(value, "despawntimer") <= 0) {
+                sprites.destroy(value, effects.fire, 100)
+            }
+        }
     }
 })
 game.onUpdateInterval(100, function () {
@@ -969,5 +1396,15 @@ game.onUpdateInterval(100, function () {
         for (let value of sprites.allOfKind(SpriteKind.Food)) {
             sprites.changeDataNumberBy(value, "despawntimer", -1)
         }
+    }
+})
+game.onUpdateInterval(1000 - 10 * coinFrequency, function () {
+    if (!(inShop)) {
+        createCoin()
+    }
+})
+game.onUpdateInterval(1000 - 10 * enemyDifficulty, function () {
+    if (!(inShop)) {
+        createEnemy()
     }
 })
